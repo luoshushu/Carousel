@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script src="//code.jquery.com/jquery-1.9.1.min.js"></script>
+  <meta charset="UTF-8">
+  <title>图片轮播</title>
+  <style>
+    .box{
+      box-sizing: border-box;
+      margin: 30px auto;
+      height: 250px;
+      width: 400px;
+      overflow: hidden;
+      position: relative;
+    }
+    a{
+      text-decoration: none;
+    }
+    .box ul,
+    .box li{
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .box .box-img{
+      position: absolute;
+    }
+    .box .box-img>li{
+      float: left;
+    }
+    .box .box-img:after,
+    .box:after{
+      content: ' ';
+      display: block;
+      clear: both;
+    }
+    .box .box-img img{
+      width: 400px;
+      height: 250px;
+    }
+    .box .Bt{
+      position: absolute;
+      top:50%;
+      margin-top: -20px;
+      display: inline-block;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%;
+      border: 1px solid #fff;
+      color: #fff;
+      text-align: center;
+    }
+    .box .leftBt{
+      left: 10px;
+    }
+    .box .rightBt{
+      right: 10px;
+    }
+    .box .box-Bt{
+      position: absolute;
+      bottom: 10px;
+      width: 100%;
+      font-size: 0;
+      text-align: center;
+    }
+    .box .box-Bt li{
+      display: inline-block;
+      height: 10px;
+      width: 40px;
+      border: 1px solid #fff;
+      border-radius: 10px;
+      margin: 0 5px;
+      cursor: pointer;
+    }
+    .box .active{
+      background: #eee;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="box">
+    <ul class="box-img">
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g1.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g2.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g3.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g4.jpg"></a></li>
+    </ul>
+    <a class="Bt leftBt" href="#"><<</a>
+    <a class="Bt rightBt" href="#"> >> </a>
+    <ul class="box-Bt">
+      <li class="active"></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+  <div class="box">
+    <ul class="box-img">
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g1.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g2.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g3.jpg"></a></li>
+      <li><a href="#"><img src="http://oy5vxcq55.bkt.clouddn.com/g4.jpg"></a></li>
+    </ul>
+    <a class="Bt leftBt" href="#"><<</a>
+    <a class="Bt rightBt" href="#"> >> </a>
+    <ul class="box-Bt">
+      <li class="active"></li>
+      <li></li>
+      <li></li>
+      <li></li>
+    </ul>
+  </div>
+
+  <script>
+    function $Box($box) {
+      this.init($box)
+      this.bind()
+      this.autoBegin()
+    }
+    $Box.prototype = {
+      init:function ($box) {
+        this.$box = $box
+        this.$boxImg  = this.$box.find('.box-img')
+        this.$boxLi   = this.$box.find('.box-img>li')
+        this.$leftBt  = this.$box.find('.leftBt')
+        this.$rightBt = this.$box.find('.rightBt')
+        this.$boxBtLi = this.$box.find('.box-Bt>li')
+
+        this.$boxImg.append(this.$boxLi.first().clone())
+        this.$boxImg.prepend(this.$boxLi.last().clone())
+        this.index = 0
+        this.imgWidth = this.$boxLi.width()
+        this.imgCount = this.$boxLi.length
+        this.$boxImg.width(( this.imgCount + 2) *  this.imgWidth )
+        this.$boxImg.css('left',-this.imgWidth)
+
+      },
+      bind:function () {
+        var _this = this
+        this.$leftBt.on('click',function () {
+          _this.LeftBt(1)
+        })
+        this.$rightBt.on('click',function () {
+          _this.RightBt(1)
+        })
+
+        this.$boxBtLi.on('click',function () {
+          var index = $(this).index()
+          if(_this.index > index){
+            _this.LeftBt(_this.index - index)
+          }else {
+            _this.RightBt(index - _this.index)
+
+          }
+        })
+        this.$boxImg.on('mouseover',function () {
+//          console.log('999')
+          _this.autoStop()
+        })
+        this.$boxImg.on('mouseout',function () {
+          console.log('000')
+          _this.autoBegin()
+        })
+
+      },
+
+      LeftBt:function (len) {
+        var _this = this
+        this.$boxImg.animate({
+          left: '+='+ this.imgWidth * len
+        },function () {
+          _this.index -= len
+          if(_this.index < 0){
+            _this.$boxImg.css('left',-_this.imgWidth * _this.imgCount)
+            _this.index = _this.imgCount - 1
+          }
+          _this.BoxBtLi()
+        })
+      },
+      RightBt:function (len) {
+        var _this = this
+        this.$boxImg.animate({
+          left: '-='+ this.imgWidth * len
+        },function () {
+          _this.index += len
+          if(_this.index === _this.imgCount){
+            _this.$boxImg.css('left',-_this.imgWidth)
+            _this.index = 0
+          }
+          _this.BoxBtLi()
+        })
+      },
+      BoxBtLi:function () {
+        this.$boxBtLi.eq(this.index).addClass('active')
+            .siblings().removeClass('active')
+      },
+      autoBegin:function () {
+        var _this = this
+        this.a = setInterval(function () {
+          _this.RightBt(1)
+        },3000)
+      },
+      autoStop:function () {
+        clearTimeout(this.a)
+      }
+
+    }
+
+    var a = new $Box($('.box').eq(0))
+    var b = new $Box($('.box').eq(1))
+
+
+
+  </script>
+</body>
+</html>
